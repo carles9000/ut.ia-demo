@@ -1,0 +1,71 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+    LOCAL o, oWeb
+	
+	DEFINE WEB oWeb TITLE 'Agent IA' 
+	
+		Menu( oWeb, 'gemini' )
+		
+		HTML oWeb
+			<style>
+				.code {
+					font-family: monospace;
+					font-size: 12px;
+				}
+			</style>
+		ENDTEXT
+		
+		DEFINE FORM o ID 'myform' API 'api_gemini' OF oWeb 
+		
+		INIT FORM o 
+		
+			ROWGROUP o			
+				GET MEMO ID 'myquestion' LABEL "Question" VALUE 'What is the OpenAI mission?'  GRID 12 OF o			
+			ENDROW o		
+
+			ROWGROUP o			
+				GET MEMO ID 'myanswer' LABEL "Answer" VALUE '' CLASS 'code' READONLY ROWS 8  GRID 12 OF o			
+			ENDROW o					
+			
+			ROWGROUP o			
+				BUTTON ID 'btn' LABEL 'Send'  ACTION 'gemini' PBS 'MyMsg' WIDTH '200px' ALIGN 'center' GRID 12 OF o	
+			ENDROW o
+			
+			DEFINE WEBSOCKETS TOKEN 'ABC-1234' OF o 		
+
+			HTML o
+				<script>
+					
+					function MyMsg() {
+	
+						$('#myform-myanswer').html( '')	
+						$('#myform-btn').html( '<i class="fas fa-spinner fa-spin"></i>&nbsp;Executing...' )		
+						$('#myform-myquestion').prop("disabled",true);						
+						$('#myform-btn').prop("disabled",true);
+						
+						return true
+					} 					
+					
+					function ShowProcess( data ) {														
+						// console.log( data )		
+						
+						var oText = $('#myform-myanswer')
+												
+						oText.html( oText.html() + data[ 'prompt' ] )
+						
+						$oText[0].selectionStart = $oText[0].selectionEnd = $oText.val().length;
+						
+						$oText.animate({
+									scrollTop: $oText[0].scrollHeight
+								}, 500);						
+					}					
+					
+				</script>
+			ENDTEXT				
+
+		ENDFORM o	
+
+	INIT WEB oWeb RETURN
+?>
+

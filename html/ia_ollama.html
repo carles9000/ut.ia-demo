@@ -1,0 +1,78 @@
+<?prg
+#include "lib/tweb/tweb.ch" 
+
+    LOCAL o, oWeb	
+	LOCAL hModels := OllamaGetModels()
+	
+	DEFINE WEB oWeb TITLE 'Agent IA' 
+	
+		Menu( oWeb, 'ollama' )
+		
+		HTML oWeb
+			<style>
+				.code {
+					font-family: monospace;
+					font-size: 12px;
+				}
+			</style>
+		ENDTEXT
+		
+		DEFINE FORM o ID 'myform' API 'api_ollama' OF oWeb 
+		
+		INIT FORM o 
+		
+			ROWGROUP o
+				SELECT ID 'model'  VALUE 'llama32' LABEL 'Model' KEYVALUE hModels GRID 6 OF o 
+			ENDROW o
+			
+			ROWGROUP o			
+				GET MEMO ID 'myquestion' LABEL "Question" VALUE 'Describe en 1 linea sobre el modelo de ia de llama3.2' GRID 12 OF o			
+			ENDROW o		
+
+			ROWGROUP o			
+				GET MEMO ID 'myanswer' LABEL "Answer" VALUE '' CLASS 'code' READONLY ROWS 8  GRID 12 OF o			
+			ENDROW o					
+			
+			ROWGROUP o			
+				BUTTON ID 'btn' LABEL 'Send'  ACTION 'llama32' PBS 'MyMsg' WIDTH '200px' ALIGN 'center' GRID 12 OF o	
+			ENDROW o
+			
+			DEFINE WEBSOCKETS TOKEN 'ABC-1234' OF o 		
+
+			HTML o
+				<script>
+					
+					function MyMsg() {
+	
+						$('#myform-myanswer').html( '')	
+						$('#myform-btn').html( '<i class="fas fa-spinner fa-spin"></i>&nbsp;Executing...' )		
+						$('#myform-model').prop("disabled",true);						
+						$('#myform-myquestion').prop("disabled",true);						
+						$('#myform-btn').prop("disabled",true);						
+
+						return true
+					} 					
+					
+					function ShowProcess( data ) {														
+												
+						var oText = $('#myform-myanswer')
+												
+						oText.html( oText.html() + data[ 'prompt' ] )
+						
+						$oText[0].selectionStart = $oText[0].selectionEnd = $oText.val().length;
+						
+						$oText.animate({
+									scrollTop: $oText[0].scrollHeight
+								}, 500);						
+					}	
+
+					function MyLog( u ) { console.log(u) }					
+					
+				</script>
+			ENDTEXT				
+
+		ENDFORM o	
+
+	INIT WEB oWeb RETURN
+?>
+
